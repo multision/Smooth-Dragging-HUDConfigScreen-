@@ -39,6 +39,7 @@ public class HUDConfigScreen extends GuiScreen {
 	// Can't remember if this is used or not.
 	private int smX, smY;
 
+	// These booleans are needed for smooth dragging.
 	private boolean dragged = false;
 
 	protected boolean hovered;
