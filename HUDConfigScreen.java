@@ -99,6 +99,12 @@ public class HUDConfigScreen extends GuiScreen {
 
             // START OF SMOOTH DRAGGING
 
+
+   int absoluteX = pos.getAbsoluteX();
+            int absoluteY = pos.getAbsoluteY();
+
+            this.hovered = mouseX >= absoluteX && mouseX <= absoluteX + renderer.getWidth() && mouseY >= absoluteY && mouseY <= absoluteY + renderer.getHeight();
+
             if (this.hovered) {
                 if (dragged) {
                     pos.setAbsolute(pos.getAbsoluteX() + mouseX - this.prevX, pos.getAbsoluteY() + mouseY - this.prevY);
