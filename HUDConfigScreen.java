@@ -1,104 +1,104 @@
 /*
 We got this working to some extent, there are still some issues.
 Dragging overlaps other elements, if anyone can find a fix PLEASE send a pull request.
+Possibly fixed by Jonathan Halterman#5542
 
 Excuse my spaghetti code. I tried my hardest to clean it up.
 Enjoy smooth dragging for your PvP Client!
 */
 
-package this.is.where.your.HUDConfigScreen.is.located;
+package location.of.your.hudconfigscreen;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
 public class HUDConfigScreen extends GuiScreen {
 
-	private final HashMap<IRenderer, ScreenPosition> renderers = new HashMap<IRenderer, ScreenPosition>();
+    int i = 0;
 
-	private Optional<IRenderer> selectedRenderer = Optional.empty();
+    // ADDED FOR SMOOTH DRAGGING
 
-	private int prevX, prevY;
-	
-	// Can't remember if this is used or not.
-	private int smX, smY;
+    private int smX, smY;
 
-	// These booleans are needed for smooth dragging.
-	private boolean dragged = false;
+    private boolean dragged = false;
 
-	protected boolean hovered;
+    protected boolean hovered;
 
-	public HUDConfigScreen(HUDManager api) {
 
-		Collection<IRenderer> registeredRenderers = api.getRegisteredRenderers();
+    private final HashMap<IRenderer, ScreenPosition> renderers = new HashMap<IRenderer, ScreenPosition>();
 
-		for(IRenderer ren : registeredRenderers) {
-			if(!ren.isEnabled()) {
-				continue;
-			}
+    private Optional<IRenderer> selectedRenderer = Optional.empty();
 
-			ScreenPosition pos = ren.load();
+    private int prevX, prevY;
 
-			if(pos == null) {
-				pos = ScreenPosition.fromRelativePosition(0.5, 0.5);
-			}
+    @Override
+    public void initGui() {
 
-			adjustBounds(ren, pos);
-			this.renderers.put(ren, pos);
-		}
-	}
+        // modified to add your own buttons <3
 
-	public void initGui() {
+        super.initGui();
+    }
 
-		// Modified to allow you to draw buttons on your mod edit screen <3
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        super.actionPerformed(button);
+    }
 
-	}
+    public HUDConfigScreen(HUDManager api) {
 
-	@Override
-	protected void actionPerformed(GuiButton button) throws IOException {
+        Collection<IRenderer> registeredRenderers = api.getRegisteredRenderers();
 
-		// Only used if you are adding buttons to the screen.
+        for (IRenderer ren : registeredRenderers) {
+            if (!ren.isEnabled()) {
+                continue;
+            }
 
-		this.updateScreen();
-	}
+            ScreenPosition pos = ren.load();
+            if (pos == null) {
+                pos = ScreenPosition.fromRelativePosition(0.5, 0.5);
+            }
 
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		// This might be an error, I don't have my IDE open while editing this to check.
-		super.drawDefaultBackground();
-		super.drawScreen(mouseX, mouseY, partialTicks);
+            adjustBounds(ren, pos);
+            this.renderers.put(ren, pos);
+        }
 
-		final float zBackup = this.zLevel;
-		this.zLevel = 200;
+    }
 
-		for(IRenderer renderer : renderers.keySet()) {
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
-			ScreenPosition pos = renderers.get(renderer);
+        super.drawDefaultBackground();
 
-			renderer.renderDummy(pos);
+        final float zBackup = this.zLevel;
+        this.zLevel = 200;
 
-			// Start of smooth dragging.
+        for (IRenderer renderer : renderers.keySet()) {
 
-			this.hovered = mouseX >= pos.getAbsoluteX() && mouseY >= pos.getAbsoluteY() && mouseX < pos.getAbsoluteX() + renderer.getWidth() && mouseY < pos.getAbsoluteY() + renderer.getHeight();
+            ScreenPosition pos = renderers.get(renderer);
 
-			if (this.hovered) {
-				if (dragged == true) {
+            Gui.drawRect(pos.getAbsoluteX(), pos.getAbsoluteY(), pos.getAbsoluteX() + renderer.getWidth(), pos.getAbsoluteY() + renderer.getHeight(), 0x33FFFFFF);
+            this.drawHollowRect(pos.getAbsoluteX(), pos.getAbsoluteY(), renderer.getWidth(), renderer.getHeight(), 0x88FFFFFF);
+
+
+            renderer.renderDummy(pos);
+
+            // START OF SMOOTH DRAGGING
+
+            if (this.hovered) {
+                if (dragged == true) {
                     pos.setAbsolute(pos.getAbsoluteX() + mouseX - this.prevX, pos.getAbsoluteY() + mouseY - this.prevY);
 
                     adjustBounds(renderer, pos);
@@ -106,34 +106,42 @@ public class HUDConfigScreen extends GuiScreen {
                     this.prevX = mouseX;
                     this.prevY = mouseY;
                 }
-			}
+            }
 
-			// End of smooth dragging.
+            // END OF SMOOTH DRAGGING
 
-		}
+        }
 
-		// Once again, I'm not sure if this is used.
-		this.smX = mouseX;
-		this.smY = mouseY;
+        this.smX = mouseX;
+        this.smY = mouseY;
 
-		this.zLevel = zBackup;
-	}
+        this.zLevel = zBackup;
+        super.drawScreen(mouseX, mouseY, partialTicks);
+    }
 
-	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if(keyCode == Keyboard.KEY_ESCAPE) {
-			renderers.entrySet().forEach((entry) -> {
-				entry.getKey().save(entry.getValue());
-			});
-			this.mc.displayGuiScreen(null);
-		}
-	}
+    private void drawHollowRect(int x, int y, int w, int h, int color) {
 
-	@Override
-    protected void mouseClickMove(int x, int y, int button, long time)
-    {
-        if (selectedRenderer.isPresent())
-        {
+        this.drawHorizontalLine(x, x + w, y, color);
+        this.drawHorizontalLine(x, x + w, y + h, color);
+
+        this.drawVerticalLine(x, y + h, y, color);
+        this.drawVerticalLine(x + w, y + h, y, color);
+
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            renderers.entrySet().forEach((entry) -> {
+                entry.getKey().save(entry.getValue());
+            });
+            this.mc.displayGuiScreen(null);
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int x, int y, int button, long time) {
+        if (selectedRenderer.isPresent()) {
             moveSelectedRenderBy(x - prevX, y - prevY);
         }
 
@@ -141,13 +149,12 @@ public class HUDConfigScreen extends GuiScreen {
         this.prevY = y;
     }
 
-    private void moveSelectedRenderBy(int offsetX, int offsetY)
-    {
+    private void moveSelectedRenderBy(int offsetX, int offsetY) {
         IRenderer renderer = selectedRenderer.get();
         ScreenPosition pos = renderers.get(renderer);
+
         pos.setAbsolute(pos.getAbsoluteX() + offsetX, pos.getAbsoluteY() + offsetY);
 
-        // Specifies Borders
         if (pos.getAbsoluteX() == 0 << 1) {
             pos.setAbsolute(1, pos.getAbsoluteY());
         }
@@ -159,91 +166,87 @@ public class HUDConfigScreen extends GuiScreen {
         adjustBounds(renderer, pos);
     }
 
-	@Override
-	public void onGuiClosed() {
+    @Override
+    public void onGuiClosed() {
 
-		for(IRenderer renderer : renderers.keySet()) {
-			renderer.save(renderers.get(renderer));
-		}
+        for (IRenderer renderer : renderers.keySet()) {
+            renderer.save(renderers.get(renderer));
+        }
+    }
 
-		super.onGuiClosed();
+    @Override
+    public boolean doesGuiPauseGame() {
+        return true;
+    }
 
-	}
+    private void adjustBounds(IRenderer renderer, ScreenPosition pos) {
 
-	@Override
-	public boolean doesGuiPauseGame() {
-		return true;
-	}
+        ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
 
-	private void adjustBounds(IRenderer renderer, ScreenPosition pos) {
+        int screenWidth = res.getScaledWidth();
+        int screenHeight = res.getScaledHeight();
 
-		ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
+        int absoluteX = Math.max(0, Math.min(pos.getAbsoluteX(), Math.max(screenWidth - renderer.getWidth(), 0)));
+        int absoluteY = Math.max(0, Math.min(pos.getAbsoluteY(), Math.max(screenHeight - renderer.getHeight(), 0)));
 
-		int screenWidth = res.getScaledWidth();
-		int screenHeight = res.getScaledHeight();
+        pos.setAbsolute(absoluteX, absoluteY);
+    }
 
-		int absoluteX = Math.max(0, Math.min(pos.getAbsoluteX(), Math.max(screenWidth - renderer.getWidth(), 0)));
-		int absoluteY = Math.max(0, Math.min(pos.getAbsoluteY(), Math.max(screenHeight - renderer.getHeight(), 0)));
+    @Override
+    protected void mouseClicked(int x, int y, int button) throws IOException {
+        this.prevX = x;
+        this.prevY = y;
 
-		pos.setAbsolute(absoluteX, absoluteY);
-	}
+        // NEEDED FOR SMOOTH DRAGGING
+        dragged = true;
 
-	@Override
-	protected void mouseClicked(int x, int y, int mobuttonuseButton) throws IOException {
-		loadMouseOver(this.prevX = x, this.prevY = y);
+        loadMouseOver(x, y);
+        super.mouseClicked(x, y, button);
+    }
 
-		// NECESSARY FOR SMOOTH DRAGGING
-		// Set the drag to true if mouse is clicked.
-		dragged = true;
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
 
-		super.mouseClicked(x, y, mobuttonuseButton);
-	}
+        // NEEDED FOR SMOOTH DRAGGING
+        dragged = false;
 
-	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int state) {
+        super.mouseReleased(mouseX, mouseY, state);
+    }
 
-		// NECESSARY FOR SMOOTH DRAGGING
-		// Set the drag to false once released.
-		dragged = false;
+    private void loadMouseOver(int x, int y) {
+        this.selectedRenderer = renderers.keySet().stream().filter(new MouseOverFinder(x, y)).findFirst();
+    }
 
-		super.mouseReleased(mouseX, mouseY, state);
-	}
+    private class MouseOverFinder implements Predicate<IRenderer> {
 
-	private void loadMouseOver(int x, int y) {
-		this.selectedRenderer = renderers.keySet().stream().filter(new MouseOverFinder(smX, smY)).findFirst();
-	}
+        private int mouseX, mouseY;
 
-	private class MouseOverFinder implements Predicate<IRenderer> {
+        public MouseOverFinder(int x, int y) {
+            this.mouseX = x;
+            this.mouseY = y;
+        }
 
-		private int mouseX, mouseY;
+        @Override
+        public boolean test(IRenderer renderer) {
 
-		public MouseOverFinder(int x, int y) {
-			this.mouseX = smX;
-			this.mouseY = smY;
-		}
+            ScreenPosition pos = renderers.get(renderer);
 
-		@Override
-		public boolean test(IRenderer renderer) {
+            int absoluteX = pos.getAbsoluteX();
+            int absoluteY = pos.getAbsoluteY();
 
-			ScreenPosition pos = renderers.get(renderer);
+            if (mouseX >= absoluteX && mouseX <= absoluteX + renderer.getWidth()) {
 
-			int absoluteX = pos.getAbsoluteX();
-			int absoluteY = pos.getAbsoluteY();
+                if (mouseY >= absoluteY && mouseY <= absoluteY + renderer.getHeight()) {
 
-			if(mouseX >= absoluteX && mouseX <= absoluteX + renderer.getWidth()) {
+                    return true;
 
-				if(mouseY >= absoluteY && mouseY <= absoluteY + renderer.getHeight()) {
+                }
 
-					return true;
+            }
 
-				}
+            return false;
+        }
 
-			}
-
-			return false;
-		}
-
-	}
-
+    }
 
 }
