@@ -1,8 +1,9 @@
 # Smooth Dragging (HUDConfigScreen)
 Smooth dragging for Eric Golde's drag system.
 
-Created by OrangeMarshall. Modified by Eric Golde to work inside of a client.
-Edited by Mason#8979 and UghItsIsaac#6037
+Original drag system created by OrangeMarshall.
+Modified by Eric Golde to properly work in a client.
+Edited by Mason#8979 and UghItsIsaac#6037 to smoothen out the dragging.
 
 How did we manage this?
 
