@@ -99,7 +99,7 @@ public class HUDConfigScreen extends GuiScreen {
 
             // START OF SMOOTH DRAGGING
 
-
+            // Thanks ESS_Si1kn#0481 for pointing out that I forgot to add these back.
             int absoluteX = pos.getAbsoluteX();
             int absoluteY = pos.getAbsoluteY();
 
