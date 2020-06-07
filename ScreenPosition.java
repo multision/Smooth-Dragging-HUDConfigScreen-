@@ -1,4 +1,4 @@
-// I have reason to believe the smooth dragging wont work without this.
+// I have reason to believe the smooth dragging won't work without this.
 // Created by Eric Golde, fix from caterpillow#3310
 
 import net.minecraft.client.Minecraft;
