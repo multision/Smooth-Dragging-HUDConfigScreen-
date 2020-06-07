@@ -15,3 +15,5 @@ We moved our drag system inside of the drawScreen method, and then boom. Smooth 
 This can be made even smoother believe it or not. Currently, mods are using ints for positioning.
 Ints are positioned by pixels. If you were to use floats instead of ints for positioning you can achieve an even smoother system.
 But if you do this I would recommend creating an anchor system, otherwise positioning mods might get hard.
+
+I'm really hoping people take this as a chance to learn and not just skid. There was a quite a lot of time put into this. I learned a few things and so did Isaac. Anyways thats the end of the README. I hope to see many wonderful clients soon!
