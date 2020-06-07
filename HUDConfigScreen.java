@@ -3,6 +3,9 @@ We got this working to some extent, there are still some issues.
 Dragging overlaps other elements, if anyone can find a fix PLEASE send a pull request.
 Possibly fixed by Jonathan Halterman#5542
 
+Please use the ScreenPosition.java file that is included in this repository.
+Thanks caterpillow#3310
+
 Enjoy smooth dragging for your PvP Client!
 */
 
@@ -97,7 +100,7 @@ public class HUDConfigScreen extends GuiScreen {
             // START OF SMOOTH DRAGGING
 
             if (this.hovered) {
-                if (dragged == true) {
+                if (dragged) {
                     pos.setAbsolute(pos.getAbsoluteX() + mouseX - this.prevX, pos.getAbsoluteY() + mouseY - this.prevY);
 
                     adjustBounds(renderer, pos);
