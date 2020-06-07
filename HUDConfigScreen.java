@@ -144,7 +144,7 @@ public class HUDConfigScreen extends GuiScreen {
     private void moveSelectedRenderBy(int offsetX, int offsetY)
     {
         IRenderer renderer = selectedRenderer.get();
-        SmokScreenPosition pos = renderers.get(renderer);
+        ScreenPosition pos = renderers.get(renderer);
         pos.setAbsolute(pos.getAbsoluteX() + offsetX, pos.getAbsoluteY() + offsetY);
 
         // Specifies Borders
