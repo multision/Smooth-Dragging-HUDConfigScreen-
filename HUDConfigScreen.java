@@ -3,7 +3,6 @@ We got this working to some extent, there are still some issues.
 Dragging overlaps other elements, if anyone can find a fix PLEASE send a pull request.
 Possibly fixed by Jonathan Halterman#5542
 
-Excuse my spaghetti code. I tried my hardest to clean it up.
 Enjoy smooth dragging for your PvP Client!
 */
 
