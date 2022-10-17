@@ -29,26 +29,20 @@ import net.minecraft.util.ResourceLocation;
 
 public class HUDConfigScreen extends GuiScreen {
 
-    int i = 0;
-
     // ADDED FOR SMOOTH DRAGGING
-
-    private int smX, smY;
 
     private boolean dragged = false;
 
     protected boolean hovered;
 
-
     private final HashMap<IRenderer, ScreenPosition> renderers = new HashMap<IRenderer, ScreenPosition>();
 
     private Optional<IRenderer> selectedRenderer = Optional.empty();
 
-    private int prevX, prevY;
+    private int offsetX, offsetY;
 
     @Override
     public void initGui() {
-
         // modified to add your own buttons <3
 
         super.initGui();
@@ -56,14 +50,16 @@ public class HUDConfigScreen extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
+        switch(button.id) {
+            case /*id of the button*/:
+                //do something
+                break;
+        }
         super.actionPerformed(button);
     }
 
     public HUDConfigScreen(HUDManager api) {
-
-        Collection<IRenderer> registeredRenderers = api.getRegisteredRenderers();
-
-        for (IRenderer ren : registeredRenderers) {
+        for (IRenderer ren : api.getRegisteredRenderers()) {
             if (!ren.isEnabled()) {
                 continue;
             }
@@ -81,14 +77,12 @@ public class HUDConfigScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-
         super.drawDefaultBackground();
 
         final float zBackup = this.zLevel;
         this.zLevel = 200;
 
         for (IRenderer renderer : renderers.keySet()) {
-
             ScreenPosition pos = renderers.get(renderer);
 
             Gui.drawRect(pos.getAbsoluteX(), pos.getAbsoluteY(), pos.getAbsoluteX() + renderer.getWidth(), pos.getAbsoluteY() + renderer.getHeight(), 0x33FFFFFF);
@@ -107,36 +101,31 @@ public class HUDConfigScreen extends GuiScreen {
 
             if (this.hovered) {
                 if (dragged) {
-                    pos.setAbsolute(pos.getAbsoluteX() + mouseX - this.prevX, pos.getAbsoluteY() + mouseY - this.prevY);
+                    pos.setAbsolute(pos.getAbsoluteX() + mouseX - this.offsetX, pos.getAbsoluteY() + mouseY - this.offsetY);
 
                     adjustBounds(renderer, pos);
 
-                    this.prevX = mouseX;
-                    this.prevY = mouseY;
+                    this.offsetX = mouseX;
+                    this.offsetY = mouseY;
                 }
             }
 
             // END OF SMOOTH DRAGGING
-
         }
-
-        this.smX = mouseX;
-        this.smY = mouseY;
 
         this.zLevel = zBackup;
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     private void drawHollowRect(int x, int y, int w, int h, int color) {
-
         this.drawHorizontalLine(x, x + w, y, color);
         this.drawHorizontalLine(x, x + w, y + h, color);
 
         this.drawVerticalLine(x, y + h, y, color);
         this.drawVerticalLine(x + w, y + h, y, color);
-
     }
 
+    /*
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (keyCode == Keyboard.KEY_ESCAPE) {
@@ -145,16 +134,16 @@ public class HUDConfigScreen extends GuiScreen {
             });
             this.mc.displayGuiScreen(null);
         }
-    }
+    }*/ //No need, if you are wondering why, it automatically saves the position when the gui is closed, so you won't need to save the position twice
 
     @Override
     protected void mouseClickMove(int x, int y, int button, long time) {
         if (selectedRenderer.isPresent()) {
-            moveSelectedRenderBy(x - prevX, y - prevY);
+            moveSelectedRenderBy(x - offsetX, y - offsetY);
         }
 
-        this.prevX = x;
-        this.prevY = y;
+        this.offsetX = x;
+        this.offsetY = y;
     }
 
     private void moveSelectedRenderBy(int offsetX, int offsetY) {
@@ -163,11 +152,11 @@ public class HUDConfigScreen extends GuiScreen {
 
         pos.setAbsolute(pos.getAbsoluteX() + offsetX, pos.getAbsoluteY() + offsetY);
 
-        if (pos.getAbsoluteX() == 0 << 1) {
+        if (pos.getAbsoluteX() == 0 /*simplified*/) {
             pos.setAbsolute(1, pos.getAbsoluteY());
         }
 
-        if (pos.getAbsoluteY() == 0 << 1) {
+        if (pos.getAbsoluteY() == 0 /*simplified*/) {
             pos.setAbsolute(pos.getAbsoluteX(), 1);
         }
 
@@ -176,19 +165,18 @@ public class HUDConfigScreen extends GuiScreen {
 
     @Override
     public void onGuiClosed() {
-
-        for (IRenderer renderer : renderers.keySet()) {
+        /*for (IRenderer renderer : renderers.keySet()) {
             renderer.save(renderers.get(renderer));
-        }
+        }*/
+        renderers.forEach(IRendererConfig::save); //Lambda is avaible from Java 8 and up, if you use older versions of Java 8 you won't be able to use it, so you have to use the normal for loop
     }
 
-    @Override
+    /*@Override
     public boolean doesGuiPauseGame() {
         return true;
-    }
+    }*/ //We don't really need it, the "doesGuiPauseGame" function is by default true
 
     private void adjustBounds(IRenderer renderer, ScreenPosition pos) {
-
         ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
 
         int screenWidth = res.getScaledWidth();
@@ -214,7 +202,6 @@ public class HUDConfigScreen extends GuiScreen {
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-
         // NEEDED FOR SMOOTH DRAGGING
         dragged = false;
 
