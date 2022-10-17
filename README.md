@@ -3,8 +3,7 @@ Smooth dragging for Eric Golde's drag system.
 
 Original drag system created by OrangeMarshall.
 Modified by Eric Golde to properly work in a client.
-Edited by Mason#8979 and UghItsIsaac#6037 to smoothen out the dragging.
-Now simplified by Save14_#7156.
+Edited by Mason#8979 and UghItsIsaac#6037 to smoothen out the dragging. Save14_(#7156) Made some changes to simplify the code
 
 How did we manage this?
 
