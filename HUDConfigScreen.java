@@ -162,12 +162,12 @@ public class HUDConfigScreen extends GuiScreen {
         ScreenPosition pos = renderers.get(renderer);
 
         pos.setAbsolute(pos.getAbsoluteX() + offsetX, pos.getAbsoluteY() + offsetY);
-
-        if (pos.getAbsoluteX() == 0 << 1) {
+        
+        if (pos.getAbsoluteX() == 0) {
             pos.setAbsolute(1, pos.getAbsoluteY());
         }
 
-        if (pos.getAbsoluteY() == 0 << 1) {
+        if (pos.getAbsoluteY() == 0) {
             pos.setAbsolute(pos.getAbsoluteX(), 1);
         }
 
